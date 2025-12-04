@@ -1,3 +1,4 @@
+using FrankCrumCrm.Application.DTOs;
 using FrankCrumCrm.Domain.Entities;
 
 namespace FrankCrumCrm.Application.Interfaces
