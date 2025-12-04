@@ -1,146 +1,238 @@
-# FrankCrum CRM API Client
+# FrankCrum CRM API
 
-A C# REST API client service for the FrankCrum.Crm.Api, generated from the OpenAPI/Swagger specification.
+A clean architecture REST API for FrankCrum CRM operations, built with .NET 8.0 and organized in a layered architecture.
+
+## Architecture
+
+The solution follows Clean Architecture principles with four distinct layers:
+
+### 🏗️ Layer Structure
+
+```
+FrankCrumCrm.sln
+├── FrankCrumCrm.Api              # API Layer - Controllers, Swagger, Authentication
+├── FrankCrumCrm.Application      # Application Layer - Services, DTOs, Interfaces
+├── FrankCrumCrm.Domain           # Domain Layer - Entities, Domain Models
+└── FrankCrumCrm.Infrastructure   # Infrastructure Layer - External API Clients, HTTP
+```
+
+#### **API Layer** (`FrankCrumCrm.Api`)
+- REST API Controllers
+- Swagger/OpenAPI configuration
+- Bearer token authentication middleware
+- Request/Response handling
+
+#### **Application Layer** (`FrankCrumCrm.Application`)
+- Business logic services
+- DTOs (Data Transfer Objects)
+- Application interfaces
+- Use case orchestration
+
+#### **Domain Layer** (`FrankCrumCrm.Domain`)
+- Domain entities
+- Domain models
+- Core business entities
+
+#### **Infrastructure Layer** (`FrankCrumCrm.Infrastructure`)
+- External API client implementations
+- HTTP client configuration
+- External service integrations
 
 ## Features
 
-- Full type-safe C# models for all API schemas
-- Service wrapper class for easy API access
-- Bearer token authentication support
-- All endpoints from the Swagger specification implemented
+- ✅ Clean Architecture with separation of concerns
+- ✅ Swagger/OpenAPI documentation
+- ✅ Bearer token authentication (dummy token "123" for now)
+- ✅ Dependency Injection
+- ✅ Type-safe domain models
+- ✅ RESTful API endpoints
 
-## Installation
+## Getting Started
 
-1. Ensure you have .NET 8.0 SDK installed
-2. Restore NuGet packages:
+### Prerequisites
+
+- .NET 8.0 SDK
+- Visual Studio 2022 or VS Code (optional)
+
+### Installation
+
+1. **Restore NuGet packages:**
    ```bash
    dotnet restore
    ```
-3. Build the project:
+
+2. **Build the solution:**
    ```bash
    dotnet build
    ```
 
-## Usage
+3. **Run the API:**
+   ```bash
+   cd FrankCrumCrm.Api
+   dotnet run
+   ```
 
-### Basic Usage
+4. **Access Swagger UI:**
+   - Navigate to `http://localhost:5000` or `https://localhost:5001`
+   - Swagger UI will be available at the root URL
 
-```csharp
-using FrankCrumCrmApiClient;
-using FrankCrumCrmApiClient.Models;
+## Authentication
 
-// Initialize the service
-var baseUrl = "https://api.example.com";
-var bearerToken = "your-bearer-token-here";
-var service = new FrankCrumCrmApiService(baseUrl, bearerToken);
+The API is protected with Bearer token authentication. For now, use the dummy token **"123"**.
 
-// Get client data
-var clientData = await service.GetClientDataAsync(123);
-Console.WriteLine($"Client: {clientData.ClientLegalName}");
+### Using Swagger UI
+
+1. Click the **"Authorize"** button in Swagger UI
+2. Enter: `Bearer 123` (include the word "Bearer" and a space)
+3. Click **"Authorize"** and then **"Close"**
+
+### Using cURL
+
+```bash
+curl -X GET "http://localhost:5000/api/v1/ClientData/123" \
+  -H "Authorization: Bearer 123"
 ```
 
-### Using with Dependency Injection
+### Using Postman/HTTP Client
 
-```csharp
-// In your Startup.cs or Program.cs
-services.AddHttpClient<FrankCrumCrmApiService>(client =>
-{
-    client.BaseAddress = new Uri("https://api.example.com");
-});
+```
+GET http://localhost:5000/api/v1/ClientData/123
+Authorization: Bearer 123
+```
 
-// In your service/controller
-public class MyService
+## API Endpoints
+
+### Client Data
+
+- `GET /api/v1/ClientData/{id}` - Get client data by ID
+- `GET /api/v1/ClientData/{clientNumber}/division/numbers` - Get division numbers
+- `POST /api/v1/ClientData/payrollprocessingstatusclients` - Get payroll processing status
+- `GET /api/v1/ClientData/pi-screen/{id}` - Get PI screen client information
+
+### Payroll Managers
+
+- `GET /api/v1/Users/PayrollManagers` - Get all payroll managers
+
+### Onboarding Automation
+
+- `GET /api/v1/OnboardingAutomation` - Get all onboarding automations
+- `GET /api/v1/OnboardingAutomation/{id}` - Get onboarding automation by ID
+- `POST /api/v1/OnboardingAutomation` - Create new onboarding automation
+- `PUT /api/v1/OnboardingAutomation/{id}` - Update onboarding automation
+- `DELETE /api/v1/OnboardingAutomation/{id}` - Delete onboarding automation
+
+## Configuration
+
+Update `appsettings.json` to configure the external CRM API:
+
+```json
 {
-    private readonly FrankCrumCrmApiService _apiService;
-    
-    public MyService(HttpClient httpClient)
-    {
-        _apiService = new FrankCrumCrmApiService(
-            httpClient, 
-            "https://api.example.com"
-        );
-        _apiService.SetBearerToken("your-token");
-    }
+  "CrmApi": {
+    "BaseUrl": "https://api.example.com",
+    "BearerToken": ""
+  }
 }
 ```
-
-### Available Service Methods
-
-#### ClientData Operations
-- `GetClientDataAsync(int id)` - Get client data by ID
-- `GetDivisionNumbersAsync(int clientNumber)` - Get division numbers for a client
-- `GetPayrollProcessingStatusClientsAsync(List<string> clientIds)` - Get payroll processing status
-- `GetPIScreenClientInformationAsync(int id)` - Get PI screen client information
-- `GetPIScreenBillingInformationAsync(int clientNumber)` - Get billing information
-- `GetPIScreenWCSurchargeAsync(int clientNumber)` - Get WC surcharges
-- `GetPIScreenPayrollInformationAsync(int id)` - Get payroll information
-- `GetPIScreenEVerifyAsync(int id)` - Get E-Verify information
-- `GetPIScreenContactsAsync(int id)` - Get client contacts
-- `GetContactTypeLookupAsync()` - Get contact type lookup
-- `GetPIScreenAdditionalContactInformationAsync(int contactId)` - Get additional contact info
-- `GetOffsetsAsync(int clientNumber, string divisionNumber)` - Get offsets
-- `GetPayrollClientDataAsync(List<int> clientIds)` - Get payroll client data
-- `GetClientProcessingTeamAsync(List<int> clientIds)` - Get processing team
-- `GetProcessingTeamContactsAsync(int clientNumber)` - Get processing team contacts
-- `UpdateClientPinAsync(string coId, UpdateClientPinRequest request)` - Update client PIN
-- `IsWOTCClientAsync(string coId)` - Check if WOTC client
-- `GetTerminatedClientsAsync(List<string> clientIds)` - Get terminated clients
-- `GetPayrollNotesAsync(int id)` / `PostPayrollNotesAsync(int id, string notes)` - Payroll notes
-- `GetBillingNotesAsync(int id)` / `PostBillingNotesAsync(int id, string notes)` - Billing notes
-- `PostPIScreenNotesAsync(int id, string notes)` - Post PI screen notes
-
-#### OnboardingAutomation Operations
-- `CreateOnboardingAutomationAsync(AddEmployerOnbTemplatesProcessedRequest request)` - Create
-- `GetAllOnboardingAutomationAsync()` - Get all
-- `GetOnboardingAutomationByIdAsync(int id)` - Get by ID
-- `UpdateOnboardingAutomationAsync(int id, AddEmployerOnbTemplatesProcessedRequest request)` - Update
-- `DeleteOnboardingAutomationAsync(int id)` - Delete
-
-#### User Operations
-- `GetPayrollManagersAsync()` - Get all payroll managers
 
 ## Project Structure
 
 ```
-├── Models/                          # All API model classes
-│   ├── ClientDataResponse.cs
-│   ├── PIScreenClientInformationResponse.cs
-│   └── ... (other models)
-├── FrankCrumCrmApiClient.cs        # Base API client
-├── FrankCrumCrmApiService.cs       # Service wrapper
-├── ExampleUsage.cs                  # Usage examples
-└── FrankCrumCrmApiClient.csproj    # Project file
+FrankCrumCrm.Api/
+├── Controllers/              # API Controllers
+│   ├── ClientDataController.cs
+│   ├── PayrollManagerController.cs
+│   └── OnboardingAutomationController.cs
+├── Program.cs                # Application entry point
+└── appsettings.json          # Configuration
+
+FrankCrumCrm.Application/
+├── DTOs/                     # Data Transfer Objects
+│   └── CreateOnboardingRequest.cs
+├── Interfaces/               # Application interfaces
+│   └── ICrmApiClient.cs
+└── Services/                 # Application services
+    └── CrmService.cs
+
+FrankCrumCrm.Domain/
+└── Entities/                 # Domain entities
+    ├── ClientData.cs
+    ├── PIScreenClientInformation.cs
+    ├── PayrollManager.cs
+    └── EmployerOnbTemplatesProcessed.cs
+
+FrankCrumCrm.Infrastructure/
+└── Clients/                  # External API clients
+    └── CrmApiClient.cs
 ```
 
-## Authentication
+## Development
 
-The API uses Bearer token authentication. Set your token when creating the service or use `SetBearerToken()` method:
+### Adding New Endpoints
+
+1. **Domain Layer**: Add entity in `FrankCrumCrm.Domain/Entities/`
+2. **Application Layer**: Add method to `ICrmApiClient` interface and `CrmService`
+3. **Infrastructure Layer**: Implement in `CrmApiClient`
+4. **API Layer**: Add controller endpoint
+
+### Example: Adding a New Endpoint
 
 ```csharp
-service.SetBearerToken("your-token-here");
-```
+// 1. Domain/Entities/NewEntity.cs
+public class NewEntity { ... }
 
-## Error Handling
+// 2. Application/Interfaces/ICrmApiClient.cs
+Task<NewEntity> GetNewEntityAsync(int id);
 
-All methods will throw `HttpRequestException` if the HTTP request fails, or `InvalidOperationException` if response deserialization fails. Wrap calls in try-catch blocks:
-
-```csharp
-try
+// 3. Application/Services/CrmService.cs
+public async Task<NewEntity> GetNewEntityAsync(int id)
 {
-    var result = await service.GetClientDataAsync(123);
+    return await _apiClient.GetNewEntityAsync(id);
 }
-catch (HttpRequestException ex)
+
+// 4. Infrastructure/Clients/CrmApiClient.cs
+public async Task<NewEntity> GetNewEntityAsync(int id)
 {
-    // Handle HTTP errors
+    return await GetAsync<NewEntity>($"/api/v1/NewEntity/{id}");
 }
-catch (Exception ex)
+
+// 5. Api/Controllers/NewEntityController.cs
+[HttpGet("{id}")]
+public async Task<IActionResult> GetNewEntity(int id)
 {
-    // Handle other errors
+    var result = await _crmService.GetNewEntityAsync(id);
+    return Ok(result);
 }
 ```
 
 ## Dependencies
 
-- .NET 8.0
-- Newtonsoft.Json (13.0.3)
-- System.Net.Http.Json (8.0.0)
+- **.NET 8.0**
+- **Swashbuckle.AspNetCore** (6.5.0) - Swagger/OpenAPI
+- **Microsoft.AspNetCore.Authentication.JwtBearer** (8.0.0) - JWT Authentication
+- **Newtonsoft.Json** (13.0.3) - JSON serialization
+- **Microsoft.Extensions.Http** (8.0.0) - HTTP client factory
+
+## Testing the API
+
+### Using Swagger UI
+
+1. Start the application
+2. Navigate to the Swagger UI
+3. Click "Authorize" and enter `Bearer 123`
+4. Try the endpoints directly from the UI
+
+### Using HTTP Client
+
+```bash
+# Get client data
+curl -X GET "http://localhost:5000/api/v1/ClientData/123" \
+  -H "Authorization: Bearer 123"
+
+# Get payroll managers
+curl -X GET "http://localhost:5000/api/v1/Users/PayrollManagers" \
+  -H "Authorization: Bearer 123"
+```
+
+## License
+
+ISC
