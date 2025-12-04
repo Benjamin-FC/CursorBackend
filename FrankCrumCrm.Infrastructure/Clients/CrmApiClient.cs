@@ -146,6 +146,107 @@ namespace FrankCrumCrm.Infrastructure.Clients
             return await DeleteAsync<bool>($"/api/v1/OnboardingAutomation/{id}");
         }
 
+        // Missing endpoints from Swagger
+        public async Task<PIScreenBillingInformation> GetPIScreenBillingInformationAsync(int clientNumber)
+        {
+            return await GetAsync<PIScreenBillingInformation>($"/api/v1/ClientData/pi-screen/billing/{clientNumber}");
+        }
+
+        public async Task<List<WCSurcharge>> GetWCSurchargesAsync(int clientNumber)
+        {
+            return await GetAsync<List<WCSurcharge>>($"/api/v1/ClientData/pi-screen/wcsurcharge/{clientNumber}");
+        }
+
+        public async Task<PIScreenPayrollInformation> GetPIScreenPayrollInformationAsync(int id)
+        {
+            return await GetAsync<PIScreenPayrollInformation>($"/api/v1/ClientData/pi-screen/payroll/{id}");
+        }
+
+        public async Task<bool> UpdatePIScreenNotesAsync(int id, string notes)
+        {
+            return await PostAsync<bool>($"/api/v1/ClientData/pi-screen/notes/{id}", notes);
+        }
+
+        public async Task<string> GetPayrollNotesAsync(int id)
+        {
+            return await GetAsync<string>($"/api/v1/ClientData/payroll/notes/{id}");
+        }
+
+        public async Task<bool> UpdatePayrollNotesAsync(int id, string notes)
+        {
+            return await PostAsync<bool>($"/api/v1/ClientData/payroll/notes/{id}", notes);
+        }
+
+        public async Task<bool> UpdateBillingNotesAsync(int id, string notes)
+        {
+            return await PostAsync<bool>($"/api/v1/ClientData/billing/notes/{id}", notes);
+        }
+
+        public async Task<string> GetBillingNotesAsync(int id)
+        {
+            return await GetAsync<string>($"/api/v1/ClientData/billing/notes/{id}");
+        }
+
+        public async Task<EVerify> GetEVerifyAsync(int id)
+        {
+            return await GetAsync<EVerify>($"/api/v1/ClientData/pi-screen/everify/{id}");
+        }
+
+        public async Task<TerminatedClientsInformation> GetTerminatedClientsAsync(List<string> clientIds)
+        {
+            return await PostAsync<TerminatedClientsInformation>("/api/v1/ClientData/terminatedclients", clientIds);
+        }
+
+        public async Task<List<PIScreenClientContact>> GetPIScreenContactsAsync(int id)
+        {
+            return await GetAsync<List<PIScreenClientContact>>($"/api/v1/ClientData/pi-screen/contacts/{id}");
+        }
+
+        public async Task<List<ContactTypeLookup>> GetContactTypeLookupAsync()
+        {
+            return await GetAsync<List<ContactTypeLookup>>("/api/v1/ClientData/pi-screen/contacttypelookup");
+        }
+
+        public async Task<PIScreenAdditionalContact> GetPIScreenAdditionalContactAsync(int contactId)
+        {
+            return await GetAsync<PIScreenAdditionalContact>($"/api/v1/ClientData/pi-screen/additional-contact-information/{contactId}");
+        }
+
+        public async Task<Offsets> GetOffsetsAsync(int clientNumber, string divisionNumber)
+        {
+            return await GetAsync<Offsets>($"/api/v1/ClientData/offsets/{clientNumber}/{divisionNumber}");
+        }
+
+        public async Task<List<ClientPayrollInformation>> GetClientPayrollInformationAsync(List<int> clientIds)
+        {
+            return await PostAsync<List<ClientPayrollInformation>>("/api/v1/ClientData/payroll/clientdata", clientIds);
+        }
+
+        public async Task<List<ClientProcessingTeam>> GetClientProcessingTeamAsync(List<int> clientIds)
+        {
+            return await PostAsync<List<ClientProcessingTeam>>("/api/v1/ClientData/ClientProcessingTeam", clientIds);
+        }
+
+        public async Task<ProcessingTeamContacts> GetProcessingTeamContactsAsync(int clientNumber)
+        {
+            return await GetAsync<ProcessingTeamContacts>($"/api/v1/ClientData/{clientNumber}/ProcessingTeamContacts");
+        }
+
+        public async Task<bool> UpdateClientPinAsync(string coId, UpdateClientPinRequest request)
+        {
+            var requestBody = new
+            {
+                clientPin = request.ClientPin,
+                legalEntityDivisionId = request.LegalEntityDivisionId
+            };
+            return await PostAsync<bool>($"/api/v1/ClientData/ClientPin/{coId}", requestBody);
+        }
+
+        public async Task<bool> IsWOTCClientAsync(string coId)
+        {
+            return await GetAsync<bool>($"/api/v1/ClientData/isWOTCClient/{coId}");
+        }
+
         private class ClientDataListResponse
         {
             [JsonProperty("clients")]
