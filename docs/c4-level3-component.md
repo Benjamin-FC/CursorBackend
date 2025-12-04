@@ -4,110 +4,76 @@ This diagram shows the components within the Web Application container and how t
 
 ```mermaid
 graph TD
-    subgraph API["Web Application Container (FrankCrumCrm.Api)"]
-        direction TB
-        ClientDataCtrl[ClientDataController<br/>Handles client data endpoints]
-        PayrollMgrCtrl[PayrollManagerController<br/>Handles payroll manager endpoints]
-        OnboardingCtrl[OnboardingAutomationController<br/>Handles onboarding automation endpoints]
-        
-        AuthMiddleware[Authentication Middleware<br/>Bearer token validation]
-        SwaggerConfig[Swagger Configuration<br/>OpenAPI documentation]
-        Program[Program.cs<br/>Dependency injection & configuration]
+    subgraph API["API Layer (FrankCrumCrm.Api)"]
+        ClientDataCtrl[ClientDataController]
+        PayrollMgrCtrl[PayrollManagerController]
+        OnboardingCtrl[OnboardingAutomationController]
+        Program[Program.cs]
+        AuthMiddleware[Auth Middleware]
+        SwaggerConfig[Swagger Config]
     end
     
     subgraph App["Application Layer (FrankCrumCrm.Application)"]
-        direction TB
-        CrmService[CrmService<br/>Business logic orchestration]
-        ICrmApiClient[ICrmApiClient<br/>Interface definition]
-        CreateOnboardingDTO[CreateOnboardingRequest<br/>DTO]
-        UpdateClientPinDTO[UpdateClientPinRequest<br/>DTO]
+        CrmService[CrmService]
+        ICrmApiClient[ICrmApiClient]
+        DTOs[DTOs]
     end
     
     subgraph Infra["Infrastructure Layer (FrankCrumCrm.Infrastructure)"]
-        direction TB
-        CrmApiClient[CrmApiClient<br/>HTTP client implementation]
-        HttpClient[HttpClient<br/>.NET HTTP client]
+        CrmApiClient[CrmApiClient]
+        HttpClient[HttpClient]
     end
     
     subgraph Domain["Domain Layer (FrankCrumCrm.Domain)"]
-        direction TB
-        ClientData[ClientData Entity]
-        PayrollManager[PayrollManager Entity]
-        PIScreenClientInfo[PIScreenClientInformation Entity]
-        EmployerOnbTemplate[EmployerOnbTemplatesProcessed Entity]
-        PIScreenBilling[PIScreenBillingInformation Entity]
-        WCSurcharge[WCSurcharge Entity]
-        EVerify[EVerify Entity]
-        OtherEntities[Other Domain Entities...]
+        Entities[Domain Entities]
     end
     
-    ExternalAPI[External CRM API<br/>Backend System]
+    ExternalAPI[External CRM API]
     
-    ClientDataCtrl -->|Uses| CrmService
-    PayrollMgrCtrl -->|Uses| CrmService
-    OnboardingCtrl -->|Uses| CrmService
+    ClientDataCtrl --> CrmService
+    PayrollMgrCtrl --> CrmService
+    OnboardingCtrl --> CrmService
+    Program --> AuthMiddleware
+    Program --> SwaggerConfig
+    Program --> CrmService
+    Program --> CrmApiClient
     
-    Program -->|Configures| AuthMiddleware
-    Program -->|Configures| SwaggerConfig
-    Program -->|Registers| CrmService
-    Program -->|Registers| CrmApiClient
+    CrmService --> ICrmApiClient
+    CrmService --> Entities
+    CrmService --> DTOs
     
-    CrmService -->|Uses| ICrmApiClient
-    CrmService -->|Uses| ClientData
-    CrmService -->|Uses| PayrollManager
-    CrmService -->|Uses| PIScreenClientInfo
-    CrmService -->|Uses| EmployerOnbTemplate
-    CrmService -->|Uses| CreateOnboardingDTO
-    CrmService -->|Uses| UpdateClientPinDTO
-    CrmService -->|Uses| PIScreenBilling
-    CrmService -->|Uses| WCSurcharge
-    CrmService -->|Uses| EVerify
+    CrmApiClient -.-> ICrmApiClient
+    CrmApiClient --> HttpClient
+    CrmApiClient --> Entities
     
-    CrmApiClient -.->|Implements| ICrmApiClient
-    CrmApiClient -->|Uses| HttpClient
-    CrmApiClient -->|Uses| ClientData
-    CrmApiClient -->|Uses| PayrollManager
-    CrmApiClient -->|Uses| PIScreenClientInfo
-    CrmApiClient -->|Uses| EmployerOnbTemplate
-    CrmApiClient -->|Uses| PIScreenBilling
-    CrmApiClient -->|Uses| WCSurcharge
-    CrmApiClient -->|Uses| EVerify
-    
-    CrmApiClient -->|HTTPS/REST| ExternalAPI
+    CrmApiClient -->|HTTPS| ExternalAPI
     
     style ClientDataCtrl fill:#4A90E2,stroke:#2E5C8A,stroke-width:2px,color:#fff
     style PayrollMgrCtrl fill:#4A90E2,stroke:#2E5C8A,stroke-width:2px,color:#fff
     style OnboardingCtrl fill:#4A90E2,stroke:#2E5C8A,stroke-width:2px,color:#fff
+    style Program fill:#4A90E2,stroke:#2E5C8A,stroke-width:1px,color:#fff
     style AuthMiddleware fill:#4A90E2,stroke:#2E5C8A,stroke-width:1px,color:#fff
     style SwaggerConfig fill:#4A90E2,stroke:#2E5C8A,stroke-width:1px,color:#fff
-    style Program fill:#4A90E2,stroke:#2E5C8A,stroke-width:1px,color:#fff
-    style CrmService fill:#7ED321,stroke:#5BA517,stroke-width:2px,color:#fff
-    style ICrmApiClient fill:#7ED321,stroke:#5BA517,stroke-width:1px,color:#fff
-    style CreateOnboardingDTO fill:#7ED321,stroke:#5BA517,stroke-width:1px,color:#fff
-    style UpdateClientPinDTO fill:#7ED321,stroke:#5BA517,stroke-width:1px,color:#fff
-    style CrmApiClient fill:#F5A623,stroke:#D68910,stroke-width:2px,color:#fff
+    style CrmService fill:#7ED321,stroke:#5BA517,stroke-width:3px,color:#fff
+    style ICrmApiClient fill:#7ED321,stroke:#5BA517,stroke-width:2px,color:#fff
+    style DTOs fill:#7ED321,stroke:#5BA517,stroke-width:1px,color:#fff
+    style CrmApiClient fill:#F5A623,stroke:#D68910,stroke-width:3px,color:#fff
     style HttpClient fill:#F5A623,stroke:#D68910,stroke-width:1px,color:#fff
-    style ClientData fill:#50E3C2,stroke:#2E8B73,stroke-width:1px,color:#000
-    style PayrollManager fill:#50E3C2,stroke:#2E8B73,stroke-width:1px,color:#000
-    style PIScreenClientInfo fill:#50E3C2,stroke:#2E8B73,stroke-width:1px,color:#000
-    style EmployerOnbTemplate fill:#50E3C2,stroke:#2E8B73,stroke-width:1px,color:#000
-    style PIScreenBilling fill:#50E3C2,stroke:#2E8B73,stroke-width:1px,color:#000
-    style WCSurcharge fill:#50E3C2,stroke:#2E8B73,stroke-width:1px,color:#000
-    style EVerify fill:#50E3C2,stroke:#2E8B73,stroke-width:1px,color:#000
-    style OtherEntities fill:#50E3C2,stroke:#2E8B73,stroke-width:1px,color:#000
-    style ExternalAPI fill:#BD10E0,stroke:#9012FE,stroke-width:2px,color:#fff
+    style Entities fill:#50E3C2,stroke:#2E8B73,stroke-width:2px,color:#000
+    style ExternalAPI fill:#BD10E0,stroke:#9012FE,stroke-width:3px,color:#fff
 ```
 
 ## Components
 
-### Web Application Layer (FrankCrumCrm.Api)
+### API Layer (FrankCrumCrm.Api)
 
 #### Controllers
-- **ClientDataController**: Handles client data related endpoints
-  - `GET /api/v1/ClientData/{id}` - Get client by ID
-  - `GET /api/v1/ClientData/{clientNumber}/division/numbers` - Get division numbers
-  - `POST /api/v1/ClientData/payrollprocessingstatusclients` - Get payroll processing status
-  - `GET /api/v1/ClientData/pi-screen/{id}` - Get PI screen information
+- **ClientDataController**: Handles 19+ client data endpoints including:
+  - Client data retrieval (`GET /api/v1/ClientData/{id}`)
+  - Division numbers (`GET /api/v1/ClientData/{clientNumber}/division/numbers`)
+  - PI Screen operations (billing, payroll, contacts, notes)
+  - Payroll processing status, offsets, processing teams
+  - Client PIN updates, WOTC client checks
 
 - **PayrollManagerController**: Handles payroll manager endpoints
   - `GET /api/v1/Users/PayrollManagers` - Get all payroll managers
@@ -120,27 +86,43 @@ graph TD
   - `DELETE /api/v1/OnboardingAutomation/{id}` - Delete
 
 #### Infrastructure Components
+- **Program.cs**: Configures dependency injection, middleware pipeline, and services
 - **Authentication Middleware**: Validates Bearer tokens
 - **Swagger Configuration**: Provides OpenAPI documentation
-- **Program.cs**: Configures dependency injection, middleware pipeline, and services
 
 ### Application Layer (FrankCrumCrm.Application)
 
-- **CrmService**: Orchestrates business logic and delegates to infrastructure
-- **ICrmApiClient**: Interface defining contract for external API communication
-- **CreateOnboardingRequest**: DTO for creating onboarding automation
+- **CrmService**: Orchestrates business logic and delegates to infrastructure layer
+- **ICrmApiClient**: Interface defining contract for external API communication (Dependency Inversion Principle)
+- **DTOs**: Data Transfer Objects including:
+  - `CreateOnboardingRequest` - For creating onboarding automation
+  - `UpdateClientPinRequest` - For updating client PIN
 
 ### Infrastructure Layer (FrankCrumCrm.Infrastructure)
 
-- **CrmApiClient**: Implements ICrmApiClient, handles HTTP communication with external API
+- **CrmApiClient**: Implements `ICrmApiClient`, handles HTTP communication with external API
 - **HttpClient**: .NET HTTP client for making REST API calls
 
 ### Domain Layer (FrankCrumCrm.Domain)
 
-- **ClientData**: Domain entity representing client information
-- **PayrollManager**: Domain entity representing payroll manager
-- **PIScreenClientInformation**: Domain entity for PI screen client data
-- **EmployerOnbTemplatesProcessed**: Domain entity for onboarding automation
+- **Domain Entities**: Core business entities including:
+  - `ClientData` - Client information
+  - `PayrollManager` - Payroll manager data
+  - `PIScreenClientInformation` - PI screen client data
+  - `PIScreenBillingInformation` - Billing information
+  - `PIScreenPayrollInformation` - Payroll information
+  - `WCSurcharge` - Workers compensation surcharges
+  - `EVerify` - E-Verify information
+  - `TerminatedClientsInformation` - Terminated client data
+  - `PIScreenClientContact` - Client contacts
+  - `ContactTypeLookup` - Contact type lookup data
+  - `PIScreenAdditionalContact` - Additional contact information
+  - `Offsets` - Payment and shipping offsets
+  - `ClientPayrollInformation` - Client payroll details
+  - `ClientProcessingTeam` - Processing team information
+  - `ProcessingTeamContacts` - Processing team contacts
+  - `EmployerOnbTemplatesProcessed` - Onboarding automation data
+  - And other domain entities
 
 ## Component Interactions
 
