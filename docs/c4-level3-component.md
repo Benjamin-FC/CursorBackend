@@ -3,39 +3,50 @@
 This diagram shows the components within the Web Application container and how they interact.
 
 ```mermaid
-graph TB
-    subgraph "Web Application Container (FrankCrumCrm.Api)"
+graph TD
+    subgraph API["Web Application Container (FrankCrumCrm.Api)"]
+        direction TB
         ClientDataCtrl[ClientDataController<br/>Handles client data endpoints]
         PayrollMgrCtrl[PayrollManagerController<br/>Handles payroll manager endpoints]
         OnboardingCtrl[OnboardingAutomationController<br/>Handles onboarding automation endpoints]
+        
         AuthMiddleware[Authentication Middleware<br/>Bearer token validation]
         SwaggerConfig[Swagger Configuration<br/>OpenAPI documentation]
         Program[Program.cs<br/>Dependency injection & configuration]
     end
     
-    subgraph "Application Layer (FrankCrumCrm.Application)"
+    subgraph App["Application Layer (FrankCrumCrm.Application)"]
+        direction TB
         CrmService[CrmService<br/>Business logic orchestration]
         ICrmApiClient[ICrmApiClient<br/>Interface definition]
         CreateOnboardingDTO[CreateOnboardingRequest<br/>DTO]
+        UpdateClientPinDTO[UpdateClientPinRequest<br/>DTO]
     end
     
-    subgraph "Infrastructure Layer (FrankCrumCrm.Infrastructure)"
+    subgraph Infra["Infrastructure Layer (FrankCrumCrm.Infrastructure)"]
+        direction TB
         CrmApiClient[CrmApiClient<br/>HTTP client implementation]
         HttpClient[HttpClient<br/>.NET HTTP client]
     end
     
-    subgraph "Domain Layer (FrankCrumCrm.Domain)"
+    subgraph Domain["Domain Layer (FrankCrumCrm.Domain)"]
+        direction TB
         ClientData[ClientData Entity]
         PayrollManager[PayrollManager Entity]
         PIScreenClientInfo[PIScreenClientInformation Entity]
         EmployerOnbTemplate[EmployerOnbTemplatesProcessed Entity]
+        PIScreenBilling[PIScreenBillingInformation Entity]
+        WCSurcharge[WCSurcharge Entity]
+        EVerify[EVerify Entity]
+        OtherEntities[Other Domain Entities...]
     end
     
-    ExternalAPI[External CRM API]
+    ExternalAPI[External CRM API<br/>Backend System]
     
     ClientDataCtrl -->|Uses| CrmService
     PayrollMgrCtrl -->|Uses| CrmService
     OnboardingCtrl -->|Uses| CrmService
+    
     Program -->|Configures| AuthMiddleware
     Program -->|Configures| SwaggerConfig
     Program -->|Registers| CrmService
@@ -47,6 +58,10 @@ graph TB
     CrmService -->|Uses| PIScreenClientInfo
     CrmService -->|Uses| EmployerOnbTemplate
     CrmService -->|Uses| CreateOnboardingDTO
+    CrmService -->|Uses| UpdateClientPinDTO
+    CrmService -->|Uses| PIScreenBilling
+    CrmService -->|Uses| WCSurcharge
+    CrmService -->|Uses| EVerify
     
     CrmApiClient -.->|Implements| ICrmApiClient
     CrmApiClient -->|Uses| HttpClient
@@ -54,14 +69,32 @@ graph TB
     CrmApiClient -->|Uses| PayrollManager
     CrmApiClient -->|Uses| PIScreenClientInfo
     CrmApiClient -->|Uses| EmployerOnbTemplate
+    CrmApiClient -->|Uses| PIScreenBilling
+    CrmApiClient -->|Uses| WCSurcharge
+    CrmApiClient -->|Uses| EVerify
     
-    CrmApiClient -->|HTTPS| ExternalAPI
+    CrmApiClient -->|HTTPS/REST| ExternalAPI
     
     style ClientDataCtrl fill:#4A90E2,stroke:#2E5C8A,stroke-width:2px,color:#fff
     style PayrollMgrCtrl fill:#4A90E2,stroke:#2E5C8A,stroke-width:2px,color:#fff
     style OnboardingCtrl fill:#4A90E2,stroke:#2E5C8A,stroke-width:2px,color:#fff
+    style AuthMiddleware fill:#4A90E2,stroke:#2E5C8A,stroke-width:1px,color:#fff
+    style SwaggerConfig fill:#4A90E2,stroke:#2E5C8A,stroke-width:1px,color:#fff
+    style Program fill:#4A90E2,stroke:#2E5C8A,stroke-width:1px,color:#fff
     style CrmService fill:#7ED321,stroke:#5BA517,stroke-width:2px,color:#fff
+    style ICrmApiClient fill:#7ED321,stroke:#5BA517,stroke-width:1px,color:#fff
+    style CreateOnboardingDTO fill:#7ED321,stroke:#5BA517,stroke-width:1px,color:#fff
+    style UpdateClientPinDTO fill:#7ED321,stroke:#5BA517,stroke-width:1px,color:#fff
     style CrmApiClient fill:#F5A623,stroke:#D68910,stroke-width:2px,color:#fff
+    style HttpClient fill:#F5A623,stroke:#D68910,stroke-width:1px,color:#fff
+    style ClientData fill:#50E3C2,stroke:#2E8B73,stroke-width:1px,color:#000
+    style PayrollManager fill:#50E3C2,stroke:#2E8B73,stroke-width:1px,color:#000
+    style PIScreenClientInfo fill:#50E3C2,stroke:#2E8B73,stroke-width:1px,color:#000
+    style EmployerOnbTemplate fill:#50E3C2,stroke:#2E8B73,stroke-width:1px,color:#000
+    style PIScreenBilling fill:#50E3C2,stroke:#2E8B73,stroke-width:1px,color:#000
+    style WCSurcharge fill:#50E3C2,stroke:#2E8B73,stroke-width:1px,color:#000
+    style EVerify fill:#50E3C2,stroke:#2E8B73,stroke-width:1px,color:#000
+    style OtherEntities fill:#50E3C2,stroke:#2E8B73,stroke-width:1px,color:#000
     style ExternalAPI fill:#BD10E0,stroke:#9012FE,stroke-width:2px,color:#fff
 ```
 
